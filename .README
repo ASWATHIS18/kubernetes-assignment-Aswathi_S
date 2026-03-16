@@ -1,0 +1,231 @@
+# Java Tomcat Application Deployment on Kubernetes
+
+# Overview
+
+This project demonstrates how to deploy a Java Servlet web application running on Tomcat** into a **Kubernetes cluster** using **Docker and Minikube**.
+
+The application is packaged as a **WAR file**, containerized using **Docker**, deployed into **Kubernetes pods**, and exposed externally using a **NodePort Service**.
+
+---
+
+# Technologies Used
+
+* Java (Servlet)
+* Maven (Build Tool)
+* Apache Tomcat
+* Docker
+* Kubernetes
+* Minikube
+---
+
+# Project Workflow
+
+
+Java Application
+       ↓
+Build WAR using Maven
+       ↓
+Dockerize using Tomcat image
+       ↓
+Deploy Docker container in Kubernetes
+       ↓
+Expose application using NodePort Service
+       ↓
+Access application from browser
+
+
+---
+
+# Project Structure
+
+
+docker-java-sample-webapp
+│
+├── Dockerfile
+├── pom.xml
+├── src/
+│   └── main/
+│        ├── java/com/sap/docker/MainServlet.java
+│        └── webapp/WEB-INF/web.xml
+│
+├── target/
+│   └── docker-java-sample-webapp-1.0-SNAPSHOT.war
+│
+└── k8s/
+     ├── deployment.yaml
+     └── service.yaml
+
+
+---
+
+# Step 1: Build the Java Application
+
+**Compile the project using Maven.**
+
+
+mvn clean package
+
+
+**This creates the WAR file:**
+
+
+target/docker-java-sample-webapp-1.0-SNAPSHOT.war
+
+
+---
+
+# Step 2: Create Docker Image
+
+Dockerfile uses Tomcat as the base image and deploys the WAR file.
+
+
+**Build the Docker image:**
+
+
+docker build -t java-tomcat-app .
+
+
+**Verify the image:**
+
+
+docker images
+
+
+---
+
+# Step 3: Start Kubernetes Cluster (Minikube)
+
+**Start Minikube:**
+
+
+minikube start
+
+
+**Check cluster status:**
+
+
+kubectl get nodes
+
+
+---
+
+# Step 4: Configure Docker to use Minikube
+
+
+eval $(minikube docker-env)
+
+
+**Build the image again so Minikube can access it:**
+
+
+docker build -t java-tomcat-app .
+
+---
+
+# Step 5: Deploy the Application in Kubernetes
+
+**Create deployment:**
+
+
+kubectl apply -f k8s/deployment.yaml
+
+
+**Verify pods:**
+
+
+kubectl get pods
+
+
+---
+
+# Step 6: Expose the Application
+
+**Create service:**
+
+
+kubectl apply -f k8s/service.yaml
+
+
+**Check services:**
+
+
+kubectl get svc
+
+
+**Example output:**
+
+
+java-tomcat-service   NodePort   80:30007
+
+
+---
+
+# Step 7: Access the Application
+
+**Get Minikube IP:**
+
+
+minikube ip
+
+
+**Open the application in browser:**
+
+
+http://<minikube-ip>:30007/app?name=[Your name as per wish]
+
+Example:
+ ttp://<minikube-ip>:30007/app?name=Aswathi
+
+
+Example output:
+
+
+Hello1 ASwathi
+
+
+---
+
+# Application Architecture
+
+
+Browser
+   ↓
+NodePort Service
+   ↓
+Kubernetes Pods
+   ↓
+Docker Container
+   ↓
+Tomcat Server
+   ↓
+Java Servlet Application
+
+
+---
+
+# Key Kubernetes Components Used
+
+**Deployment**
+
+* Manages application pods
+* Ensures desired number of replicas
+
+**Service (NodePort)**
+
+* Exposes the application outside the cluster
+* Allows external access via node IP and port
+
+---
+
+# Result
+
+The Java servlet application is successfully:
+
+* Built using Maven
+* Containerized using Docker
+* Deployed in Kubernetes using Minikube
+* Exposed externally using a NodePort service
+
+The application can be accessed through a browser and responds dynamically using query parameters.
+
+---
